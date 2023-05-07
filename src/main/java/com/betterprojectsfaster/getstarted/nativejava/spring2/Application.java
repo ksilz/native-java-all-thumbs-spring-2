@@ -14,7 +14,7 @@ public class Application implements CommandLineRunner {
 	public void run(String... args) throws Exception {
 		System.out.println();
 		System.out.println("****************************************");
-		System.out.println("*   ALL THUMBS SPRING BOOT 2.7 1.0.3   *");
+		System.out.println("*   ALL THUMBS SPRING BOOT 2.x 1.1.1   *");
 		System.out.println("****************************************");
 		System.out.println();
 

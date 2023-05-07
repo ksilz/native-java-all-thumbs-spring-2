@@ -17,18 +17,21 @@ import java.util.List;
 import java.util.Scanner;
 
 public class PdfCreator {
+
+  public static final int NUMBER_OF_RUNS = 5;
+
   void createPdfs() throws DocumentException {
     try {
       System.out.println(
-          "This program will convert all JPG, PNG, and GIF pictures in the current directory into PDF.");
+              "This program will convert all JPG, PNG, and GIF pictures in the current directory into PDF.");
       System.out.println();
       System.out.println(
-          "JVM: "
-              + SystemUtils.JAVA_VM_VENDOR
-              + " "
-              + SystemUtils.JAVA_VM_NAME
-              + " "
-              + SystemUtils.JAVA_VM_VERSION);
+              "JVM: "
+                      + SystemUtils.JAVA_VM_VENDOR
+                      + " "
+                      + SystemUtils.JAVA_VM_NAME
+                      + " "
+                      + SystemUtils.JAVA_VM_VERSION);
       System.out.println();
 
       var pid = ProcessHandle.current().pid();
@@ -40,14 +43,14 @@ public class PdfCreator {
 
       if (files != null && files.length > 0) {
         List<File> pictureFiles =
-            Arrays.stream(files)
-                .filter(
-                    f ->
-                        f.isFile()
-                            && (f.getName().endsWith(".jpg")
-                                || f.getName().endsWith(".gif")
-                                || f.getName().endsWith(".png")))
-                .toList();
+                Arrays.stream(files)
+                        .filter(
+                                f ->
+                                        f.isFile()
+                                                && (f.getName().endsWith(".jpg")
+                                                || f.getName().endsWith(".gif")
+                                                || f.getName().endsWith(".png")))
+                        .toList();
 
         if (pictureFiles.size() > 0) {
           var currentDir = inputDir.getCanonicalPath();
@@ -64,32 +67,36 @@ public class PdfCreator {
 
           if (goOn) {
             System.out.println(
-                "Creating PDFs for " + pictureFiles.size() + " pictures in the 'pdf' directory...");
-            var counter = 1;
-            System.out.println();
+                    "Creating PDFs for " + pictureFiles.size() + " pictures in the 'pdf' directory...");
             var start = System.currentTimeMillis();
 
-            for (var aFile : pictureFiles) {
-              System.out.print("\r  File " + counter);
-              var document = new Document(PageSize.LETTER);
-              var baseName = FilenameUtils.getBaseName(aFile.getName());
-              var pdfFile = new File(outputDir, baseName + ".pdf");
-              var pdfOutputStream = new FileOutputStream(pdfFile);
-              var writer = PdfWriter.getInstance(document, pdfOutputStream);
+            for (var i = 1; i <= NUMBER_OF_RUNS; i++) {
+              System.out.println();
+              System.out.println("Pass " + i + "/" + NUMBER_OF_RUNS);
+              var counter = 1;
 
-              writer.open();
-              document.open();
+              for (var aFile : pictureFiles) {
+                System.out.print("\r  File " + counter);
+                var document = new Document(PageSize.LETTER);
+                var baseName = FilenameUtils.getBaseName(aFile.getName());
+                var pdfFile = new File(outputDir, baseName + ".pdf");
+                var pdfOutputStream = new FileOutputStream(pdfFile);
+                var writer = PdfWriter.getInstance(document, pdfOutputStream);
 
-              var imagePath = aFile.toPath().toAbsolutePath().toString();
-              var image = Image.getInstance(imagePath);
+                writer.open();
+                document.open();
 
-              image.setAbsolutePosition(0, 0);
-              image.scaleToFit(PageSize.LETTER);
-              document.add(image);
+                var imagePath = aFile.toPath().toAbsolutePath().toString();
+                var image = Image.getInstance(imagePath);
 
-              document.close();
-              writer.close();
-              counter++;
+                image.setAbsolutePosition(0, 0);
+                image.scaleToFit(PageSize.LETTER);
+                document.add(image);
+
+                document.close();
+                writer.close();
+                counter++;
+              }
             }
 
             var stop = System.currentTimeMillis();
